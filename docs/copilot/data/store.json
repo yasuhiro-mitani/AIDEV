@@ -1,0 +1,39 @@
+{
+  "questions": [
+    {
+      "id": "Q-20250930-001",
+      "title": "test",
+      "context": "どうやってモデルを切り替えるのか",
+      "attempts": "",
+      "tags": [
+        "疑問"
+      ],
+      "priority": "medium",
+      "status": "open",
+      "answer": "",
+      "answer_history": [],
+      "created": "2025-09-30T02:14:28Z",
+      "updated": "2025-09-30T02:15:07Z"
+    },
+    {
+      "id": "Q-20250930-002",
+      "title": "困ってます",
+      "context": "モデルの切り替え方がわかりません",
+      "attempts": "左下のアイコンを右クリックしても何も出ない",
+      "tags": [
+        "モデル"
+      ],
+      "priority": "medium",
+      "status": "answered",
+      "answer": "右下のアイコンから切り替えるんだよ",
+      "answer_history": [
+        {
+          "timestamp": "2025-09-30T02:16:58Z",
+          "content": "右下のアイコンから切り替えるんだよ"
+        }
+      ],
+      "created": "2025-09-30T02:16:21Z",
+      "updated": "2025-09-30T02:16:58Z"
+    }
+  ]
+}

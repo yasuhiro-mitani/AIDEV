@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <title>Tetris Mini</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="container">
+    <div class="left">
+      <canvas id="board" width="300" height="600"></canvas>
+      <div class="controls">
+        <p>Keyboard: © ¨ move, ª rotate, « soft drop, Space hard drop, P pause, C/Shift hold</p>
+      </div>
+    </div>
+    <div class="right">
+      <h1>Tetris</h1>
+      <div class="stats">
+        <div>Score: <span id="score">0</span></div>
+        <div>Lines: <span id="lines">0</span></div>
+        <div>Level: <span id="level">1</span></div>
+      </div>
+      <div class="hold">
+        <div class="label">Hold</div>
+        <canvas id="hold" width="120" height="120"></canvas>
+      </div>
+      <div class="next">
+        <div class="label">Next</div>
+        <canvas id="next" width="120" height="120"></canvas>
+      </div>
+      <button id="restart">Restart</button>
+      <div class="touch-controls">
+        <button type="button" id="btn-left">©</button>
+        <button type="button" id="btn-rotate">?</button>
+        <button type="button" id="btn-right">¨</button>
+        <button type="button" id="btn-down">«</button>
+        <button type="button" id="btn-drop">?</button>
+        <button type="button" id="btn-hold">Hold</button>
+        <button type="button" id="btn-pause">Pause</button>
+      </div>
+      <div id="paused" class="paused hidden">Paused</div>
+      <div id="gameover" class="gameover hidden">Game Over</div>
+    </div>
+  </div>
+  <script src="game.js"></script>
+</body>
+</html>

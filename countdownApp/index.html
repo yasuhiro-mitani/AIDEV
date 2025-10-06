@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Countdown App</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#222" />
+</head>
+<body>
+  <header>
+    <h1>Countdown App</h1>
+  </header>
+  <main>
+    <section class="new-target">
+      <h2>ターゲット日を追加</h2>
+      <form id="target-form">
+        <label>
+          タイトル
+          <input type="text" id="title" required placeholder="例: プロジェクト締切" />
+        </label>
+        <label>
+          日付と時間
+          <input type="datetime-local" id="datetime" required />
+        </label>
+        <label class="notify-row">
+          <input type="checkbox" id="dailyNotify" /> 毎朝通知 (ローカル通知/Push設定が必要)
+        </label>
+        <button type="submit">追加</button>
+      </form>
+    </section>
+
+    <section>
+      <h2>カウントダウン一覧</h2>
+      <ul id="countdown-list" class="countdown-list" aria-live="polite"></ul>
+    </section>
+    <section class="push-section">
+      <h2>通知設定 (Push)</h2>
+      <div id="push-status" class="push-status">未登録</div>
+      <button id="push-subscribe-btn" type="button">通知を有効化</button>
+      <button id="push-unsubscribe-btn" type="button" disabled>通知を解除</button>
+      <button id="push-test-btn" type="button" disabled>テスト通知送信</button>
+      <small>※ 毎朝通知はサーバ側のスケジュールにより送信されます。</small>
+    </section>
+  </main>
+
+  <template id="countdown-item-template">
+    <li class="countdown-item">
+      <div class="item-header">
+        <span class="item-title"></span>
+        <button class="remove-btn" title="削除" aria-label="削除">×</button>
+      </div>
+      <div class="time-remaining" data-finished-text="完了!"></div>
+      <div class="target-date"></div>
+      <div class="notify-status"></div>
+    </li>
+  </template>
+
+  <footer>
+    <small>オフライン対応 (PWA)。通知には追加設定が必要です。</small>
+  </footer>
+  <script src="app.js" type="module"></script>
+</body>
+</html>

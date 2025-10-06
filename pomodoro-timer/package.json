@@ -1,0 +1,13 @@
+{
+  "name": "pomodoro-timer",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node src/server/index.js",
+    "start": "node src/server/index.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2"
+  }
+}

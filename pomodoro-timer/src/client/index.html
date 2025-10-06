@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <title>ポモドーロタイマー</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      color-scheme: light dark;
+      --focus-color: #ff6b6b;
+      --short-break-color: #4ecdc4;
+      --long-break-color: #6c5ce7;
+      --surface: rgba(255, 255, 255, 0.85);
+      --text-color: #1f2933;
+      --muted: #64748b;
+      --border: rgba(15, 23, 42, 0.12);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+      min-height: 100vh;
+      background: #f2f4f8;
+      color: var(--text-color);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      transition: background 0.4s ease;
+    }
+
+    body[data-mode="focus"] {
+      background: linear-gradient(135deg, #ffe6e6, #fff5f5);
+    }
+
+    body[data-mode="shortBreak"] {
+      background: linear-gradient(135deg, #e6fffb, #f0fff9);
+    }
+
+    body[data-mode="longBreak"] {
+      background: linear-gradient(135deg, #ecebff, #f5f3ff);
+    }
+
+    main {
+      background: var(--surface);
+      backdrop-filter: blur(12px);
+      border-radius: 18px;
+      box-shadow: 0 18px 48px rgba(15, 23, 42, 0.18);
+      width: min(440px, 100%);
+      padding: 2rem;
+    }
+
+    h1 {
+      margin: 0 0 0.25rem;
+      font-size: 1.8rem;
+    }
+
+    .tagline {
+      margin: 0 0 1.5rem;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    .display {
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .mode {
+      font-size: 1rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+
+    .mode-focus {
+      color: var(--focus-color);
+    }
+
+    .mode-shortBreak {
+      color: var(--short-break-color);
+    }
+
+    .mode-longBreak {
+      color: var(--long-break-color);
+    }
+
+    .time {
+      font-size: 4rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      margin-bottom: 1rem;
+    }
+
+    .progress {
+      width: 100%;
+      height: 10px;
+      background: rgba(148, 163, 184, 0.3);
+      border-radius: 999px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 0;
+      transition: width 0.3s ease;
+    }
+
+    .controls {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0.75rem;
+      margin-bottom: 1.5rem;
+    }
+
+    button {
+      padding: 0.75rem 1rem;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: white;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+    }
+
+    button:hover:enabled {
+      transform: translateY(-1px);
+      box-shadow: 0 10px 24px rgba(15, 23, 42, 0.16);
+    }
+
+    button:disabled {
+      cursor: not-allowed;
+      opacity: 0.6;
+      box-shadow: none;
+    }
+
+    .status {
+      display: grid;
+      gap: 0.4rem;
+      margin-bottom: 1.5rem;
+      font-size: 0.95rem;
+      color: var(--muted);
+    }
+
+    fieldset {
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 1rem 1.25rem 1.25rem;
+      display: grid;
+      gap: 0.75rem;
+    }
+
+    legend {
+      font-weight: 600;
+      padding: 0 0.4rem;
+    }
+
+    label {
+      display: grid;
+      gap: 0.35rem;
+      font-size: 0.9rem;
+    }
+
+    input[type=number] {
+      padding: 0.55rem 0.65rem;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+      font-size: 1rem;
+    }
+
+    .toggle {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+
+    .toggle input {
+      width: 1.1rem;
+      height: 1.1rem;
+    }
+
+    .config-actions {
+      display: flex;
+      justify-content: flex-end;
+    }
+
+    .config-actions button {
+      width: auto;
+      padding-inline: 1.2rem;
+      background: #111827;
+      color: white;
+      border: none;
+    }
+
+    @media (max-width: 520px) {
+      body {
+        padding: 1.5rem;
+      }
+
+      main {
+        padding: 1.5rem;
+      }
+
+      .time {
+        font-size: 3.2rem;
+      }
+
+      .controls {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+  </style>
+</head>
+<body data-mode="focus">
+  <main>
+    <header>
+      <h1>ポモドーロタイマー</h1>
+      <p class="tagline">短い集中と休憩を繰り返して効率よく作業しましょう。</p>
+    </header>
+    <section class="display">
+      <div id="modeLabel" class="mode mode-focus">集中</div>
+      <div id="timeDisplay" class="time">25:00</div>
+      <div class="progress">
+        <div id="progressFill" class="progress-fill mode-focus"></div>
+      </div>
+    </section>
+    <section class="controls">
+      <button id="startBtn">開始</button>
+      <button id="pauseBtn" disabled>一時停止</button>
+      <button id="resetBtn">リセット</button>
+      <button id="skipBtn">スキップ</button>
+    </section>
+    <section class="status">
+      <div>完了した集中セッション: <strong id="focusCount">0</strong></div>
+      <div>次のロングブレイクまであと <strong id="nextLongBreak">4</strong> 回の集中セッション</div>
+    </section>
+    <form id="configForm">
+      <fieldset>
+        <legend>セッション設定</legend>
+        <label>
+          集中時間 (分)
+          <input type="number" id="focusMinutes" min="1" max="180" value="25" />
+        </label>
+        <label>
+          短い休憩 (分)
+          <input type="number" id="shortMinutes" min="1" max="60" value="5" />
+        </label>
+        <label>
+          長い休憩 (分)
+          <input type="number" id="longMinutes" min="1" max="90" value="15" />
+        </label>
+        <label>
+          ロングブレイクまでの集中回数
+          <input type="number" id="longBreakInterval" min="1" max="12" value="4" />
+        </label>
+        <label class="toggle">
+          <input type="checkbox" id="autoStartToggle" />
+          <span>次のセッションを自動で開始</span>
+        </label>
+        <div class="config-actions">
+          <button type="submit">設定を適用</button>
+        </div>
+      </fieldset>
+    </form>
+  </main>
+  <script>
+    (function() {
+      const STORAGE_KEY = 'pomodoroTimerSettings';
+      const modeNames = {
+        focus: '集中',
+        shortBreak: '短い休憩',
+        longBreak: '長い休憩'
+      };
+
+      const settings = {
+        focus: 25,
+        shortBreak: 5,
+        longBreak: 15,
+        interval: 4,
+        autoStart: false
+      };
+
+      const state = {
+        mode: 'focus',
+        running: false,
+        remaining: settings.focus * 60,
+        timerId: null,
+        completedFocus: 0
+      };
+
+      const timeDisplay = document.getElementById('timeDisplay');
+      const modeLabel = document.getElementById('modeLabel');
+      const startBtn = document.getElementById('startBtn');
+      const pauseBtn = document.getElementById('pauseBtn');
+      const resetBtn = document.getElementById('resetBtn');
+      const skipBtn = document.getElementById('skipBtn');
+      const focusCount = document.getElementById('focusCount');
+      const nextLongBreak = document.getElementById('nextLongBreak');
+      const progressFill = document.getElementById('progressFill');
+      const focusInput = document.getElementById('focusMinutes');
+      const shortInput = document.getElementById('shortMinutes');
+      const longInput = document.getElementById('longMinutes');
+      const intervalInput = document.getElementById('longBreakInterval');
+      const autoStartToggle = document.getElementById('autoStartToggle');
+      const configForm = document.getElementById('configForm');
+
+      function loadSettings() {
+        try {
+          const stored = localStorage.getItem(STORAGE_KEY);
+          if (!stored) return;
+          const parsed = JSON.parse(stored);
+          if (typeof parsed.focus === 'number') settings.focus = parsed.focus;
+          if (typeof parsed.shortBreak === 'number') settings.shortBreak = parsed.shortBreak;
+          if (typeof parsed.longBreak === 'number') settings.longBreak = parsed.longBreak;
+          if (typeof parsed.interval === 'number') settings.interval = parsed.interval;
+          if (typeof parsed.autoStart === 'boolean') settings.autoStart = parsed.autoStart;
+        } catch (err) {
+          console.warn('保存済みの設定を読み込めませんでした', err);
+        }
+      }
+
+      function saveSettings() {
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
+        } catch (err) {
+          console.warn('設定を保存できませんでした', err);
+        }
+      }
+
+      function syncInputs() {
+        focusInput.value = settings.focus;
+        shortInput.value = settings.shortBreak;
+        longInput.value = settings.longBreak;
+        intervalInput.value = settings.interval;
+        autoStartToggle.checked = settings.autoStart;
+      }
+
+      function secondsForMode(mode) {
+        if (mode === 'focus') return Math.max(1, settings.focus) * 60;
+        if (mode === 'shortBreak') return Math.max(1, settings.shortBreak) * 60;
+        return Math.max(1, settings.longBreak) * 60;
+      }
+
+      function formatTime(totalSeconds) {
+        const minutes = Math.floor(totalSeconds / 60);
+        const seconds = totalSeconds % 60;
+        return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+      }
+
+      function updateProgress() {
+        const duration = secondsForMode(state.mode);
+        const elapsed = duration - state.remaining;
+        const safeDuration = duration || 1;
+        const percent = Math.min(100, Math.max(0, (elapsed / safeDuration) * 100));
+        progressFill.style.width = `${percent}%`;
+        progressFill.className = `progress-fill mode-${state.mode}`;
+      }
+
+      function updateStatusIndicators() {
+        focusCount.textContent = state.completedFocus;
+        const interval = Math.max(1, settings.interval);
+        const mod = state.completedFocus % interval;
+        const remainingUntilLong = state.mode === 'longBreak' && state.completedFocus > 0
+          ? 0
+          : mod === 0 ? interval : interval - mod;
+        nextLongBreak.textContent = remainingUntilLong;
+      }
+
+      function updateUI() {
+        timeDisplay.textContent = formatTime(state.remaining);
+        modeLabel.textContent = modeNames[state.mode];
+        modeLabel.className = `mode mode-${state.mode}`;
+        document.body.dataset.mode = state.mode;
+        startBtn.disabled = state.running;
+        pauseBtn.disabled = !state.running;
+        updateStatusIndicators();
+        updateProgress();
+      }
+
+      function clearTimer() {
+        if (state.timerId) {
+          clearInterval(state.timerId);
+          state.timerId = null;
+        }
+        state.running = false;
+      }
+
+      function startTimer() {
+        if (state.running) return;
+        state.running = true;
+        state.timerId = setInterval(onTick, 1000);
+        updateUI();
+      }
+
+      function pauseTimer() {
+        if (!state.running) return;
+        clearTimer();
+        updateUI();
+      }
+
+      function setMode(mode, autoStartNext) {
+        clearTimer();
+        state.mode = mode;
+        state.remaining = secondsForMode(mode);
+        updateUI();
+        if (autoStartNext) {
+          startTimer();
+        }
+      }
+
+      function handleTransition(manual = false) {
+        if (state.mode === 'focus') {
+          if (!manual) {
+            state.completedFocus += 1;
+          }
+          const interval = Math.max(1, settings.interval);
+          const shouldLongBreak = state.completedFocus > 0 && state.completedFocus % interval === 0;
+          setMode(shouldLongBreak ? 'longBreak' : 'shortBreak', settings.autoStart);
+        } else {
+          setMode('focus', settings.autoStart);
+        }
+      }
+
+      function onTick() {
+        if (!state.running) return;
+        if (state.remaining <= 0) {
+          handleTransition(false);
+          return;
+        }
+        state.remaining -= 1;
+        updateUI();
+        if (state.remaining === 0) {
+          handleTransition(false);
+        }
+      }
+
+      function resetTimer() {
+        clearTimer();
+        state.mode = 'focus';
+        state.remaining = secondsForMode('focus');
+        state.completedFocus = 0;
+        updateUI();
+      }
+
+      startBtn.addEventListener('click', () => {
+        startTimer();
+      });
+
+      pauseBtn.addEventListener('click', () => {
+        pauseTimer();
+      });
+
+      resetBtn.addEventListener('click', () => {
+        resetTimer();
+      });
+
+      skipBtn.addEventListener('click', () => {
+        handleTransition(true);
+      });
+
+      configForm.addEventListener('submit', (event) => {
+        event.preventDefault();
+        settings.focus = Math.min(180, Math.max(1, Number(focusInput.value) || settings.focus));
+        settings.shortBreak = Math.min(60, Math.max(1, Number(shortInput.value) || settings.shortBreak));
+        settings.longBreak = Math.min(90, Math.max(1, Number(longInput.value) || settings.longBreak));
+        settings.interval = Math.min(12, Math.max(1, Math.floor(Number(intervalInput.value) || settings.interval)));
+        settings.autoStart = autoStartToggle.checked;
+        saveSettings();
+        setMode(state.mode, state.running);
+      });
+
+      loadSettings();
+      syncInputs();
+      resetTimer();
+      updateUI();
+    })();
+  </script>
+</body>
+</html>

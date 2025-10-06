@@ -1,0 +1,64 @@
+:root {
+  --bg: #0f172a;
+  --fg: #e5e7eb;
+  --accent: #22d3ee;
+  --muted: #94a3b8;
+  color-scheme: light dark;
+}
+
+@media (prefers-color-scheme: light) {
+  :root { --bg: #ffffff; --fg: #111827; --muted: #6b7280; --accent: #0ea5e9; }
+}
+
+html, body { height: 100%; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  display: grid;
+  place-items: center;
+}
+
+.wrap {
+  width: min(92vw, 640px);
+  padding: 1rem;
+}
+
+h1 {
+  font-size: 1.25rem;
+  margin: 0 0 .75rem 0;
+  letter-spacing: .02em;
+}
+
+canvas#game {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 3 / 2; /* maintain 480x320 ratio */
+  border-radius: 8px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(0,0,0,0.12));
+  box-shadow: 0 6px 24px rgba(0,0,0,0.25);
+}
+
+.hud {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  margin-top: .75rem;
+}
+
+button {
+  appearance: none;
+  border: 1px solid color-mix(in oklab, var(--fg) 20%, transparent);
+  background: transparent;
+  color: var(--fg);
+  padding: .4rem .7rem;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+button:hover { border-color: var(--accent); box-shadow: 0 0 0 2px color-mix(in oklab, var(--accent) 35%, transparent); }
+button:active { transform: translateY(1px); }
+
+.hint { color: var(--muted); font-size: .9rem; margin-left: auto; }
+

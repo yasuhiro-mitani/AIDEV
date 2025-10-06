@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+  <title>Breakout</title>
+  <link rel="stylesheet" href="./styles.css">
+  <link rel="preload" as="script" href="./game.js">
+  <meta name="description" content="Simple Breakout game using HTML5 Canvas.">
+  <meta name="color-scheme" content="light dark">
+  <style>/* Fallback minimal style if CSS fails */
+    body { font-family: system-ui, sans-serif; }
+  </style>
+  </head>
+<body>
+  <main class="wrap">
+    <h1>Breakout</h1>
+    <canvas id="game" width="480" height="320" aria-label="Breakout game area"></canvas>
+    <div class="hud">
+      <button id="pauseBtn" aria-pressed="false">Pause</button>
+      <button id="resetBtn">Reset</button>
+      <span class="hint">Controls: ← → or mouse/touch</span>
+    </div>
+  </main>
+  <script src="./game.js"></script>
+  </body>
+  </html>
+
